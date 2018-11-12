@@ -40,25 +40,44 @@ function! s:ExecuteCP(count, isloclist)
   endtry
 endfunction
 
-function! QFEnter#OpenQFItem(wintype, opencmd, keepfocus)
+function! QFEnter#OpenQFItem(wintype, opencmd, qfwincmd)
+  let qftabnr = tabpagenr()
   let qfbufnr = bufnr('%')
   let qflnum = line('.')
 
   call s:OpenQFItem(a:wintype, a:opencmd, qflnum)
 
-  if a:keepfocus=='1'
+  if a:qfwincmd == 'f'
     redraw
+
+    let after_tabnr = tabpagenr()
+
+    if qftabnr != after_tabnr
+      call s:JumpToTab(qftabnr)
+    endif
+
     let qfwinnr = bufwinnr(qfbufnr)
     exec qfwinnr.'wincmd w'
-  elseif a:keepfocus=='2'
+  elseif a:qfwincmd == 'c'
     redraw
+
+    let after_tabnr = tabpagenr()
+
+    if qftabnr != after_tabnr
+      call s:JumpToTab(qftabnr)
+    endif
+
     let qfwinnr = bufwinnr(qfbufnr)
     exec qfwinnr.'wincmd c'
+
+    if qftabnr != after_tabnr
+      call s:JumpToTab(after_tabnr)
+    endif
   endif
 endfunction
 
-"wintype: 'o', 'v', 'h', 't'
-"opencmd: 'c', 'n', 'p'
+" wintype: 'o', 'v', 'h', 't'
+" opencmd: 'c', 'n', 'p'
 function! s:OpenQFItem(wintype, opencmd, qflnum)
   let lnumqf = a:qflnum
 
@@ -69,15 +88,15 @@ function! s:OpenQFItem(wintype, opencmd, qflnum)
   endif
 
   " arrange a window or tab in which quickfix item to be opened
-  if a:wintype==#'o'
+  if a:wintype ==# 'o'
     wincmd p
-  elseif a:wintype==#'v'
+  elseif a:wintype ==# 'v'
     wincmd p
     vnew
-  elseif a:wintype==#'h'
+  elseif a:wintype ==# 'h'
     wincmd p
     new
-  elseif a:wintype==#'t'
+  elseif a:wintype ==# 't'
     let qfview = winsaveview()
 
     let modifier = ''
@@ -106,11 +125,11 @@ function! s:OpenQFItem(wintype, opencmd, qflnum)
   let before_winnr = winnr()
 
   " execute vim quickfix open commands
-  if a:opencmd==#'c'
+  if a:opencmd ==# 'c'
     call s:ExecuteCC(lnumqf, isloclist)
-  elseif a:opencmd==#'n'
+  elseif a:opencmd ==# 'n'
     call s:ExecuteCN(lnumqf, isloclist)
-  elseif a:opencmd==#'p'
+  elseif a:opencmd ==# 'p'
     call s:ExecuteCP(lnumqf, isloclist)
   endif
 
@@ -120,12 +139,12 @@ function! s:OpenQFItem(wintype, opencmd, qflnum)
   let after_tabnr = tabpagenr()
   let after_winnr = winnr()
   if (match(&switchbuf,'useopen')>-1 || match(&switchbuf,'usetab')>-1)
-    if a:wintype==#'t'
+    if a:wintype ==# 't'
       if before_tabnr!=after_tabnr
         call s:JumpToTab(before_tabnr)
         call s:CloseTab(after_tabnr)
       endif
-    elseif a:wintype==#'v'|| a:wintype==#'h'
+    elseif a:wintype ==# 'v'|| a:wintype ==# 'h'
       if before_tabnr!=after_tabnr  |"when 'usetab' applied
         call s:JumpToTab(before_tabnr)
         call s:CloseWin(after_winnr)
@@ -140,7 +159,7 @@ function! s:OpenQFItem(wintype, opencmd, qflnum)
   "echo before_winnr after_winnr
 
   " restore quickfix window when tab mode
-  if a:wintype==#'t'
+  if a:wintype ==# 't'
     if g:qfenter_enable_autoquickfix
       if isloclist
         exec modifier 'lopen'

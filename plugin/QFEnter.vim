@@ -3,58 +3,59 @@
 " Author:       yssl <http://github.com/yssl>
 " License:      MIT License
 
-if exists("g:loaded_qfenter") || &cp
+if exists('g:loaded_qfenter') || &cp
   finish
 endif
 
 let g:loaded_qfenter  = 1
 let s:keepcpo         = &cpo
 set cpo&vim
-"""""""""""""""""""""""""""""""""""""""""""""
+
+""""""""""""""""""""""""""""""""""""""""""""
 
 " static variables
 
 " cmd-action map (key-value pairs)
-" value[0]: wintype (o-open, v-vert, h-horz, t-tab)
-" value[1]: opencmd (c-cc, n-cnext, p-cprev)
-" value[2]: keepfocus (0-do not keep focus, 1-keep focus, 2-close)
+" value[0]: wintype (o - open, v - vert, h - horz, t - tab)
+" value[1]: opencmd (c - cc, n - cnext, p - cprev)
+" value[2]: qfwincmd (l - leave, f - focus, c - close)
 let s:cmd_action_map = {
-        \'open':        'oc0',
-        \'vopen':       'vc0',
-        \'hopen':       'hc0',
-        \'topen':       'tc0',
-        \'cnext':       'on0',
-        \'vcnext':      'vn0',
-        \'hcnext':      'hn0',
-        \'tcnext':      'tn0',
-        \'cprev':       'op0',
-        \'vcprev':      'vp0',
-        \'hcprev':      'hp0',
-        \'tcprev':      'tp0',
-        \'open_keep':   'oc1',
-        \'vopen_keep':  'vc1',
-        \'hopen_keep':  'hc1',
-        \'topen_keep':  'tc1',
-        \'cnext_keep':  'on1',
-        \'vcnext_keep': 'vn1',
-        \'hcnext_keep': 'hn1',
-        \'tcnext_keep': 'tn1',
-        \'cprev_keep':  'op1',
-        \'vcprev_keep': 'vp1',
-        \'hcprev_keep': 'hp1',
-        \'tcprev_keep': 'tp1',
-        \'open_close':   'oc2',
-        \'vopen_close':  'vc2',
-        \'hopen_close':  'hc2',
-        \'topen_close':  'tc2',
-        \'cnext_close':  'on2',
-        \'vcnext_close': 'vn2',
-        \'hcnext_close': 'hn2',
-        \'tcnext_close': 'tn2',
-        \'cprev_close':  'op2',
-        \'vcprev_close': 'vp2',
-        \'hcprev_close': 'hp2',
-        \'tcprev_close': 'tp2',
+        \'open':         'ocl',
+        \'vopen':        'vcl',
+        \'hopen':        'hcl',
+        \'topen':        'tcl',
+        \'cnext':        'onl',
+        \'vcnext':       'vnl',
+        \'hcnext':       'hnl',
+        \'tcnext':       'tnl',
+        \'cprev':        'opl',
+        \'vcprev':       'vpl',
+        \'hcprev':       'hpl',
+        \'tcprev':       'tpl',
+        \'open_keep':    'ocf',
+        \'vopen_keep':   'vcf',
+        \'hopen_keep':   'hcf',
+        \'topen_keep':   'tcf',
+        \'cnext_keep':   'onf',
+        \'vcnext_keep':  'vnf',
+        \'hcnext_keep':  'hnf',
+        \'tcnext_keep':  'tnf',
+        \'cprev_keep':   'opf',
+        \'vcprev_keep':  'vpf',
+        \'hcprev_keep':  'hpf',
+        \'tcprev_keep':  'tpf',
+        \'open_close':   'occ',
+        \'vopen_close':  'vcc',
+        \'hopen_close':  'hcc',
+        \'topen_close':  'tcc',
+        \'cnext_close':  'onc',
+        \'vcnext_close': 'vnc',
+        \'hcnext_close': 'hnc',
+        \'tcnext_close': 'tnc',
+        \'cprev_close':  'opc',
+        \'vcprev_close': 'vpc',
+        \'hcprev_close': 'hpc',
+        \'tcprev_close': 'tpc',
       \}
 
 " global variables
@@ -99,13 +100,14 @@ function! s:RegisterKeymap()
   for [cmd, keylist] in items(g:qfenter_keymap)
     let wintype = s:cmd_action_map[cmd][0]
     let opencmd = s:cmd_action_map[cmd][1]
-    let keepfocus = s:cmd_action_map[cmd][2]
+    let qfwincmd = s:cmd_action_map[cmd][2]
     for key in keylist
-      execute 'nnoremap <silent> <buffer> '.key.' :call QFEnter#OpenQFItem("'.wintype.'","'.opencmd.'","'.keepfocus.'")<CR>'
+      execute 'nnoremap <silent> <buffer> '.key.' :call QFEnter#OpenQFItem("'.wintype.'","'.opencmd.'","'.qfwincmd.'")<CR>'
     endfor
   endfor
 endfunction
 
 """"""""""""""""""""""""""""""""""""""""""""
+
 let &cpo = s:keepcpo
 unlet s:keepcpo
